@@ -9,6 +9,7 @@ const userRoutes = require('./routes/userRoute')
 
 const connectDB = require('./config/connectDB')
 const UserModel = require('./models/user.model')
+const SessionModel = require('./models/session.model')
 // const AddressModel = require('./models/address.model')
 // const ProductModel = require('./models/product.model')
 // const SubcategoryModel = require('./models/subcategory.model')
