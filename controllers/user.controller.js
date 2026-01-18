@@ -345,4 +345,22 @@ const changePassword = async (req, res) => {
     }
 }
 
-module.exports = { register, verify, reVerify, login, logout, forgotPassword, verifyOTP, changePassword }
+const allUsers = async (req, res) => {
+    try {
+        const users = await UserModel.find()
+        return res.status(200).json({
+            success: true,
+            users: users
+        })
+    }
+    catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        })
+    }
+}
+    
+
+
+module.exports = { register, verify, reVerify, login, logout, forgotPassword, verifyOTP, changePassword, allUsers }
