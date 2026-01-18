@@ -67,7 +67,7 @@ const userSchema = new mongoose.Schema({
     
     phoneNumber: {
         type: String,
-        required: true
+        // required: true
     },
     
     // createdAt: {
