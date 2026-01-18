@@ -12,6 +12,6 @@ router.post('/logout', isAuthenticated, logout)
 router.post('/forgot-password', forgotPassword)
 router.post('/verify-otp/:email', verifyOTP)
 router.post('/change-password/:email', changePassword)
-router.get('/all-users',isAdmin, allUsers)
+router.get('/all-users',isAuthenticated, isAdmin, allUsers)
 
 module.exports = router

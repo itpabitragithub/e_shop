@@ -37,6 +37,7 @@ const isAuthenticated = async (req, res, next) => {
         if (!user.isLoggedIn) {
             return res.status(401).json({ success: false, message: "User is not logged in" })
         }
+        req.user = user
         req.userId = user._id
         next()
     }
