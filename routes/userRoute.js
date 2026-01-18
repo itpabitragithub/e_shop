@@ -1,5 +1,6 @@
 const express = require('express')
-const { register, verify, reVerify, login, logout } = require('../controllers/user.controller')
+const { register, verify, reVerify, login, logout, forgotPassword, verifyOTP, changePassword} = require('../controllers/user.controller')
+const isAuthenticated = require('../middleware/isAuthenticated')
 
 const router = express.Router()
 
@@ -7,6 +8,9 @@ router.post('/register', register)
 router.post('/verify', verify)
 router.post('/reverify', reVerify)
 router.post('/login', login)
-// router.post('/logout', logout)
+router.post('/logout', isAuthenticated, logout)
+router.post('/forgot-password', forgotPassword)
+router.post('/verify-otp/:email', verifyOTP)
+router.post('/change-password/:email', changePassword)
 
 module.exports = router
