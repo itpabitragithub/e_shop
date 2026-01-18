@@ -4,6 +4,7 @@ const {isAuthenticated, isAdmin} = require('../middleware/isAuthenticated')
 
 const router = express.Router()
 
+
 router.post('/register', register)
 router.post('/verify', verify)
 router.post('/reverify', reVerify)
