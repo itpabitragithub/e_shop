@@ -4,14 +4,17 @@ require('dotenv').config()
 const morgan = require('morgan')
 const helmet = require('helmet')
 const cookieParser = require('cookie-parser')
+
+const userRoutes = require('./routes/userRoute')
+
 const connectDB = require('./config/connectDB')
 const UserModel = require('./models/user.model')
-const AddressModel = require('./models/address.model')
-const ProductModel = require('./models/product.model')
-const SubcategoryModel = require('./models/subcategory.model')
-const CategoryModel = require('./models/category.model')
-const OrderModel = require('./models/order.model')
-const CartproductModel = require('./models/cartproduct.model')
+// const AddressModel = require('./models/address.model')
+// const ProductModel = require('./models/product.model')
+// const SubcategoryModel = require('./models/subcategory.model')
+// const CategoryModel = require('./models/category.model')
+// const OrderModel = require('./models/order.model')
+// const CartproductModel = require('./models/cartproduct.model')
 
 const app = express()
 app.use(cors({
@@ -25,6 +28,8 @@ app.use(helmet({
     crossOriginResourcePolicy: false 
 }))  
 connectDB()
+
+app.use('/api/user', userRoutes)
 
 app.get('/', (req, res) => {  
     res.json({ 

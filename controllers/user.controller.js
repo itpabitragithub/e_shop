@@ -1,6 +1,6 @@
 const UserModel = require('../models/user.model')
 
-export const register = async (req, res) => {
+const register = async (req, res) => {
     try {
         const { firstName, lastName, email, password } = req.body
         if (!firstName || !lastName || !email || !password) {
@@ -36,3 +36,5 @@ export const register = async (req, res) => {
         })
     }
 }
+
+module.exports = { register }
