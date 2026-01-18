@@ -360,7 +360,41 @@ const allUsers = async (req, res) => {
         })
     }
 }
+
+const getUserDetails = async (req, res) => {
+    try {
+        const {userId} = req.params
+        const user = await UserModel.findById(userId).select("-password -otp -otp_expires -token")
+        if(!user){
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+        return res.status(200).json({
+            success: true,
+            user: user
+        })
+    }
+    catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        })
+    }
+}
     
 
 
-module.exports = { register, verify, reVerify, login, logout, forgotPassword, verifyOTP, changePassword, allUsers }
+
+module.exports = { register, 
+    verify, 
+    reVerify, 
+    login, 
+    logout, 
+    forgotPassword, 
+    verifyOTP, 
+    changePassword, 
+    allUsers, 
+    getUserDetails 
+}
