@@ -2,26 +2,35 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
-    name: {
+    firstName: {
         type: String,
-        required: [true, "Name is required"]
+        required: true
     },
+    lastName: {
+        type: String,
+        required: true
+    },
+    profilePic: {
+        type: String,
+        default: ""
+    }, // Cloudinary image URL
+    profilePicPublicId: {
+        type: String,
+        default: ""
+    }, // Cloudinary public ID for deletion
     email: {
         type: String,
-        required: [true, "Email is required"],
+        required: true,
         unique: true
     },
     password: {
         type: String,
-        required: [true, "Password is required"]
+        required: true
     },
-    avatar: {
+    role: {
         type: String,
-        default: ""
-    },
-    mobile: {
-        type: String,
-        required: [true, "Mobile is required"]
+        enum: ["ADMIN", "USER"],
+        default: "USER"
     },
     refresh_token: {
         type: String,
@@ -31,40 +40,36 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    last_login: {
-        type: Date,
-        default: Date.now
+    isLoggedIn: {
+        type: Boolean,
+        default: false
     },
-    status: {
-        type: String,
-        enum: ["active", "inactive"],
-        default: "active"
-    },
-    address_details: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Address"
-    },
-    shopping_cart: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Cartproduct"
-    },
-    orderHistory: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Order"
-    },
-    forgot_password_otp: {
+    otp: {
         type: String,
         default: null
     },
-    forgot_password_otp_expires: {
+    otp_expires: {
         type: Date,
+        default: null
+    },
+    address_details: {
+        type: String,
+        ref: "Address"
+    },
+    city: {
+        type: String,
         default: ""
     },
-    role: {
+    zipCode: {
         type: String,
-        enum: ["ADMIN", "USER"],
-        default: "USERS"
+        default: ""
     },
+    
+    phoneNumber: {
+        type: String,
+        required: true
+    },
+    
     // createdAt: {
     //     type: Date,
     //     default: Date.now
@@ -73,7 +78,6 @@ const userSchema = new mongoose.Schema({
     //     type: Date,
     //     default: Date.now
     // }
-
 
 }, { 
     timestamps: true 

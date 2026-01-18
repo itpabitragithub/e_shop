@@ -26,13 +26,13 @@ app.use(helmet({
 }))  
 connectDB()
 
-app.use('/', (req, res) => {  
+app.get('/', (req, res) => {  
     res.json({ 
         message: "Server is running Properly"
     })
 })
 
-PORT = process.env.PORT
+const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
     console.log(`Server running at port ${PORT}`);
 
