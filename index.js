@@ -17,10 +17,10 @@ const SessionModel = require('./models/session.model')
 // const OrderModel = require('./models/order.model')
 // const CartproductModel = require('./models/cartproduct.model')
 
-const app = express()
+const app = express() 
 app.use(cors({
     credentials: true, //
-    origin: process.env.FRONTEND_URL
+    origin: "http://localhost:5173"
 }))
 app.use(express.json()) // read and parse JSON data sent from the client to your Express server.
 app.use(cookieParser())
