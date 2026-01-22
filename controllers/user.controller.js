@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const verifyEmail = require('../emailVerify/verifyEmail')
 const SessionModel = require('../models/session.model')
 const sendOTPMail = require('../emailVerify/sendOTPMail')
+const cloudinary = require('../utlis/cloudinary')
 
 const register = async (req, res) => {
     try {

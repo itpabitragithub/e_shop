@@ -1,52 +1,40 @@
 const mongoose = require('mongoose')
 
 const productSchema = new mongoose.Schema({
-    name: {
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    productName: {
         type: String,
-  },
-  image:{
-    type : Array,
-    default : []
-  },
-    category: [
-        {
-        type: mongoose.Schema.ObjectId,
-        ref: "Category"
+        required: true
+    },
+    productDesc: {
+        type: String,
+        required: true
+    },
+    productImg: [{
+        url:{
+            type: String,
+            required: true
+        },
+        public_id:{
+            type: String,
+            required: true
+        },
+        cloudinary_id:{
+            type: String,
+            required: true
         }
-    ],
-    subCategory: [
-        {
-        type: mongoose.Schema.ObjectId,
-        ref: "Subcategory"
-        }
-    ],
-    unit: {
-        type: String,
-        default: ""
-    },
-    stock: {
+    }],
+    productPrice: {
         type: Number,
-        default: 0
     },
-    price: {
-        type: Number,
-        default: 0
+    category: {
+        type:String
     },
-    discount: {
-        type: Number,
-        default: 0
-    },
-    description: {
-        type: String,
-        default: ""
-    },
-    more_details: {
-        type: Object,
-        default: ""
-    },
-    publish: {
-        type: Boolean,
-        default: true
+    brand: {
+        type:String
     }
 },{
     timestamps: true
