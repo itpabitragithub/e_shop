@@ -208,12 +208,13 @@ const logout = async (req, res) => {
         await UserModel.findByIdAndUpdate(userId, { isLoggedIn: false })
         return res.status(200).json({
             success: true,
-            message: "Logout successful" })
+            message: "Logout successful"
+        })
     }
     catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Internal server error", 
+            message: "Internal server error",
             error: error.message
         })
     }
@@ -224,9 +225,10 @@ const forgotPassword = async (req, res) => {
         const { email } = req.body
         const user = await UserModel.findOne({ email })
         if (!user) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                message: "User not found" })
+                message: "User not found"
+            })
         }
         const otp = Math.floor(100000 + Math.random() * 900000).toString()
         const otp_expires = Date.now() + 10 * 60 * 1000 // 10 minutes
@@ -235,7 +237,7 @@ const forgotPassword = async (req, res) => {
 
         await user.save()
         await sendOTPMail(otp, email)
-        
+
         return res.status(200).json({
             success: true,
             message: "OTP sent to email successfully"
@@ -248,40 +250,41 @@ const forgotPassword = async (req, res) => {
         })
     }
 }
-   
+
 const verifyOTP = async (req, res) => {
     try {
-        const {otp} = req.body
+        const { otp } = req.body
         const email = req.params.email
-        if(!otp){
+        if (!otp) {
             return res.status(400).json({
                 success: false,
                 message: "OTP is required"
             })
         }
         const user = await UserModel.findOne({ email })
-        if(!user){
+        if (!user) {
             return res.status(400).json({
                 success: false,
                 message: "User not found"
             })
         }
-        if(!user.otp || !user.otp_expires){
-            return res.status(400).json({ 
-                success: false, 
-                message: "Otp is not generated or already verified" 
+        if (!user.otp || !user.otp_expires) {
+            return res.status(400).json({
+                success: false,
+                message: "Otp is not generated or already verified"
             })
         }
-        if(user.otp_expires < Date.now()){
+        if (user.otp_expires < Date.now()) {
             return res.status(400).json({
                 success: false,
                 message: "OTP has expired please generate a new one"
             })
         }
-        if(user.otp !== otp){
+        if (user.otp !== otp) {
             return res.status(400).json({
-                 success: false, 
-                 message: "Invalid OTP" })
+                success: false,
+                message: "Invalid OTP"
+            })
         }
         user.otp = null
         user.otp_expires = null
@@ -291,7 +294,7 @@ const verifyOTP = async (req, res) => {
             message: "OTP verified successfully"
         })
     }
-    
+
     catch (error) {
         return res.status(500).json({
             success: false,
@@ -309,21 +312,21 @@ const changePassword = async (req, res) => {
             })
         }
         const { newPassword, confirmPassword } = req.body
-        const {email} = req.params
+        const { email } = req.params
         const user = await UserModel.findOne({ email })
-        if(!user){
+        if (!user) {
             return res.status(400).json({
                 success: false,
                 message: "User not found"
             })
         }
-        if(!newPassword || !confirmPassword){
+        if (!newPassword || !confirmPassword) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
             })
         }
-        if(newPassword !== confirmPassword){
+        if (newPassword !== confirmPassword) {
             return res.status(400).json({
                 success: false,
                 message: "Passwords do not match"
@@ -363,9 +366,9 @@ const allUsers = async (req, res) => {
 
 const getUserDetails = async (req, res) => {
     try {
-        const {userId} = req.params
+        const { userId } = req.params
         const user = await UserModel.findById(userId).select("-password -otp -otp_expires -token")
-        if(!user){
+        if (!user) {
             return res.status(400).json({
                 success: false,
                 message: "User not found"
@@ -383,18 +386,91 @@ const getUserDetails = async (req, res) => {
         })
     }
 }
-    
+
+const updateUser = async (req, res) => {
+    try {
+        const userIdUpdate = req.params.id // the ID the user we want to update
+        const loggedInUser = req.user // from isAuthenticated middleware
+        const { firstName, lastName, phoneNumber, address, city, zipCode } = req.body
+
+        if (loggedInUser._id.toString() !== userIdUpdate && loggedInUser.role !== "ADMIN") {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to update this profile"
+            })
+        }
+
+        let user = await UserModel.findById(userIdUpdate)
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+
+        let profilePicUrl = user.profilePic;
+        let profilePicPublicId = user.profilePicPublicId;
+
+        //if new profile pic is uploaded
+        if (req.file) {
+            //delete the old profile pic
+            if (profilePicPublicId) {
+                await cloudinary.uploader.destroy(profilePicPublicId)
+            }
+
+            const uploadResult = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: "profiles",
+                    },
+                    (error, result) => {
+                        if (error) reject(error)
+                        else resolve(result)
+                    }
+                )
+                stream.end(req.file.buffer)
+            })
+            profilePicUrl = uploadResult.secure_url;
+            profilePicPublicId = uploadResult.public_id;
+        }
+
+        //update fields
+        user.firstName = firstName || user.firstName;
+        user.lastName = lastName || user.lastName;
+        // user.email = email || user.email;
+        user.phoneNumber = phoneNumber || user.phoneNumber;
+        user.address = address || user.address;
+        user.city = city || user.city;
+        user.zipCode = zipCode || user.zipCode;
+        user.profilePic = profilePicUrl ;
+        user.profilePicPublicId = profilePicPublicId || user.profilePicPublicId;
+        const updatedUser = await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            user: updatedUser
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
 
 
 
-module.exports = { register, 
-    verify, 
-    reVerify, 
-    login, 
-    logout, 
-    forgotPassword, 
-    verifyOTP, 
-    changePassword, 
-    allUsers, 
-    getUserDetails 
+module.exports = {
+    register,
+    verify,
+    reVerify,
+    login,
+    logout,
+    forgotPassword,
+    verifyOTP,
+    changePassword,
+    allUsers,
+    getUserDetails,
+    updateUser
 }
