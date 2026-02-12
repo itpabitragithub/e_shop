@@ -5,7 +5,7 @@ import { Button } from './ui/button'
 
 const FilterSidebar = ({ allProducts, priceRange, category, brand, search, setSearch, setCategory, setBrand, setPriceRange }) => {
 
-    const Categories = allProducts.map(p => p.category)
+    const Categories = allProducts.map(p => p.category).filter(cat => cat != null && cat !== "")
     const UniqueCategory = ["All", ...new Set(Categories)]
 
     const Brands = allProducts.map(p => p.brand)
@@ -57,7 +57,7 @@ const FilterSidebar = ({ allProducts, priceRange, category, brand, search, setSe
                                 type='radio'
                                 // id={`category-${index}`}
                                 name='category'
-                                checked={category === item}
+                                checked={item === "All" ? category === item : category?.toLowerCase().trim() === item?.toLowerCase().trim()}
                                 onChange={() => handleCategoryClick(item)} />
                             <label htmlFor="">{item}</label>
                         </div>

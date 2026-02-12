@@ -53,11 +53,22 @@ const Products = () => {
     let filtered = [...allProducts];
 
     if(search.trim() !== ""){
-        filtered = filtered.filter(p=>p.productName.toLowerCase().includes(search.toLowerCase()))
+        const searchTerm = search.toLowerCase().trim();
+        // Check if search term matches any category exactly (case-insensitive)
+        const categories = [...new Set(allProducts.map(p => p.category).filter(cat => cat != null && cat !== ""))];
+        const matchingCategory = categories.find(cat => cat?.toLowerCase().trim() === searchTerm);
+        
+        if(matchingCategory){
+            // If search matches a category, filter by category
+            filtered = filtered.filter(p=>p.category?.toLowerCase().trim() === searchTerm)
+        } else {
+            // Otherwise, search in product names
+            filtered = filtered.filter(p=>p.productName.toLowerCase().includes(searchTerm))
+        }
     }
 
     if(category !== "All"){
-        filtered = filtered.filter(p=>p.category === category)
+        filtered = filtered.filter(p=>p.category?.toLowerCase().trim() === category.toLowerCase().trim())
     }
 
     if(brand !== "All"){
