@@ -67,6 +67,8 @@ function Profile() {
     // Update form state when user data changes
     useEffect(() => {
         if (user) {
+            // Check if there's a pending profilePic in localStorage
+            const pendingProfilePic = localStorage.getItem('pendingProfilePic')
             setUpdateUser({
                 firstName: user?.firstName || '',
                 lastName: user?.lastName || '',
@@ -75,7 +77,7 @@ function Profile() {
                 address: user?.address || '',
                 city: user?.city || '',
                 zipCode: user?.zipCode || '',
-                profilePic: user?.profilePic || '',
+                profilePic: pendingProfilePic || user?.profilePic || '',
                 role: user?.role || '',
             })
         }
@@ -88,7 +90,15 @@ function Profile() {
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0]
         setFile(selectedFile)
-        setUpdateUser({ ...updateUser, profilePic: URL.createObjectURL(selectedFile) }) // Preview only
+        // Convert file to base64 for persistence across page refreshes
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            const base64String = reader.result
+            setUpdateUser({ ...updateUser, profilePic: base64String })
+            // Store base64 string in localStorage to persist on refresh
+            localStorage.setItem('pendingProfilePic', base64String)
+        }
+        reader.readAsDataURL(selectedFile)
     }
 
     const handleSubmit = async (e) => {
@@ -120,6 +130,8 @@ function Profile() {
             if (response.data.success) {
                 toast.success(response.data.message)
                 dispatch(setUser(response.data.user))
+                // Clear pending profilePic from localStorage after successful update
+                localStorage.removeItem('pendingProfilePic')
             }
             // else {
             //     toast.error(response.data.message)
