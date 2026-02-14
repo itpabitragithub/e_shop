@@ -6,11 +6,19 @@ import { Plus, Minus, Trash2 } from 'lucide-react';
 import { setCart } from '@/redux/productSlice';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
 
 const Cart = () => {
     const {cart} = useSelector((store) => store.product);
     const dispatch = useDispatch();
     const accessToken = localStorage.getItem('token');
+
+    const subtotal = cart?.totalPrice;
+    const shipping = subtotal > 299 ? 0 : 10;
+    const tax = subtotal * 0.05;
+    const total = subtotal + shipping + tax;
 
     useEffect(() => {
         const fetchCart = async () => {
@@ -153,27 +161,38 @@ const Cart = () => {
                                 );
                             })}
                         </div>
-                        <div className='lg:w-[350px] flex-shrink-0'>
-                            <div className='bg-white rounded-lg shadow-md p-6 sticky top-24'>
-                                <h2 className='text-xl font-bold text-gray-800 mb-4'>Order Summary</h2>
-                                <div className='space-y-3 mb-4'>
-                                    <div className='flex justify-between text-gray-600'>
-                                        <span>Subtotal</span>
-                                        <span>₹{cart?.totalPrice || 0}</span>
+                        <div>
+                            <Card className='w-[400px]'>
+                                <CardHeader>
+                                    <CardTitle>Order Summary</CardTitle>
+                                </CardHeader>
+                                <CardContent className='space-y-4'>
+                                    <div className='flex justify-between'>
+                                        <span>Subtotal ({cart?.items?.length} items)</span>
+                                        <span>₹{cart?.totalPrice?.toLocaleString('en-IN')}</span>
                                     </div>
-                                    <div className='flex justify-between text-gray-600'>
+                                    <div className='flex justify-between'>
                                         <span>Shipping</span>
-                                        <span>Free</span>
+                                        <span>₹{shipping}</span>
                                     </div>
-                                    <div className='border-t pt-3 flex justify-between text-xl font-bold text-gray-800'>
+                                    <div className='flex justify-between'>
+                                        <span>Tax(5%)</span>
+                                        <span>₹{tax}</span>
+                                    </div>
+                                    <Separator />
+                                    <div className='flex justify-between font-bold text-lg'>
                                         <span>Total</span>
-                                        <span>₹{cart?.totalPrice || 0}</span>
+                                        <span>₹{total}</span>
                                     </div>
-                                </div>
-                                <Button className='w-full bg-purple-600 hover:bg-purple-700 text-white'>
-                                    Proceed to Checkout
-                                </Button>
-                            </div>
+                                    <div className='space-y-3 pt pt-4'>
+                                        <div flex space-x-2>
+                                            <Input placeholder='Promo code' />
+                                            <Button variant="outline">Apply</Button>
+                                        </div>
+                                        <Button className='w-full bg-pink-600'>PLACE ORDER</Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </div>
                     </div>
                 </div>
