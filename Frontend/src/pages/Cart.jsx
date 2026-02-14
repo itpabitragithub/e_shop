@@ -13,16 +13,33 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Cart = () => {
     const {cart} = useSelector((store) => store.product);
-    const dispatch = useDispatch();
-    const accessToken = localStorage.getItem('token');
+    
 
     const subtotal = cart?.totalPrice;
     const shipping = subtotal > 299 ? 0 : 10;
     const tax = subtotal * 0.05;
     const total = subtotal + shipping + tax;
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
+    const API = "http://localhost:3000/api/cart";
+    const accessToken = localStorage.getItem('accessToken');
 
+    const handleUpdateQuantity = async (productId, type) => {
+        try {
+            const response = await axios.put(`${API}/update-quantity`, { productId, type}, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+            if (response.data.success) {
+                dispatch(setCart(response.data.cart));
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
 
   return (
     <div className='pt-20 bg-gray-100 min-h-screen'>
@@ -41,9 +58,9 @@ const Cart = () => {
                                                 <p>₹{item?.productId?.productPrice}</p>
                                             </div>
                                             <div className='flex items-center gap-5'>
-                                                <Button onClick={() => updateQuantity(getProductId(item), 'decrease')}><Minus className='w-4 h-4' /></Button>
+                                                <Button onClick={() => handleUpdateQuantity(item?.productId?._id, 'decrease')}><Minus className='w-4 h-4' /></Button>
                                                 <span>{item?.quantity}</span>
-                                                <Button variant='outline' onClick={() => updateQuantity(getProductId(item), 'increase')}><Plus className='w-4 h-4' /></Button>
+                                                <Button onClick={() => handleUpdateQuantity(item?.productId?._id, 'increase')}><Plus className='w-4 h-4' /></Button>
                                             </div>
                                             <p>₹{(item?.productId?.productPrice) * (item?.quantity)}</p>
                                             <p className='text-red-500 flex items-center gap-2 cursor-pointer' onClick={() => removeFromCart(getProductId(item))}><Trash2 className='w-4 h-4' /></p>
@@ -118,14 +135,3 @@ const Cart = () => {
 }
 
 export default Cart
-
-{/* <div className='text-center'>
-                        <h2 className='text-3xl font-bold text-gray-800 mb-4'>Your cart is empty</h2>
-                        <p className='text-gray-600 mb-6'>Looks like you haven't added anything to your cart yet.</p>
-                        <Button 
-                            onClick={() => window.location.href = '/products'}
-                            className='bg-purple-600 hover:bg-purple-700 text-white'
-                        >
-                            Continue Shopping
-                        </Button>
-                    </div> */}
