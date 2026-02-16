@@ -150,6 +150,13 @@ const removeFromCart = async (req, res) => {
         const userId = req.userId;
         const { productId } = req.body;
 
+        if (!productId) {
+            return res.status(400).json({
+                success: false,
+                message: "Product ID is required"
+            })
+        }
+
         let cart = await CartModel.findOne({ userId });
         if (!cart) {
             return res.status(404).json({
@@ -157,15 +164,24 @@ const removeFromCart = async (req, res) => {
                 message: "Cart not found"
             })
         }
+        
+        // Filter out the item to remove
         cart.items = cart.items.filter(item => item.productId.toString() !== productId);
+        
+        // Recalculate total price
         cart.totalPrice = cart.items.reduce(
             (acc, item) => acc + item.price * item.quantity, 0
         )
+        
         await cart.save();
+        
+        // Populate product details before sending response
+        const populatedCart = await CartModel.findById(cart._id).populate("items.productId");
+        
         res.status(200).json({
             success: true,
             message: "Item removed from cart successfully",
-            cart
+            cart: populatedCart
         })
     } catch (error) {
         res.status(500).json({

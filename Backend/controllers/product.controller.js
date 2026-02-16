@@ -126,6 +126,29 @@ const deleteProduct = async (req, res) => {
     }
 }
 
+const getSingleProduct = async (req, res) => {
+    try {
+        const { productId } = req.params
+        const product = await ProductModel.findById(productId)
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            })
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Product fetched successfully",
+            product: product
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 const updateProduct = async (req, res) => {
     try {
         const { productId } = req.params
@@ -192,6 +215,7 @@ const updateProduct = async (req, res) => {
 module.exports = {
     addProduct,
     getAllProducts,
+    getSingleProduct,
     deleteProduct,
     updateProduct
 }
