@@ -186,7 +186,7 @@ const Cart = () => {
                                             <Input placeholder='Promo code' className='flex-1' />
                                             <Button variant="outline">Apply</Button>
                                         </div>
-                                        <Button className='w-full bg-pink-600 hover:bg-pink-700'>PLACE ORDER</Button>
+                                        <Button onClick={()=>navigate('/address')} className='w-full bg-pink-600 hover:bg-pink-700'>PLACE ORDER</Button>
                                         <Button variant="outline" className='w-full bg-transparent'>
                                             <Link to='/products'>Continue Shopping</Link>
                                         </Button>
