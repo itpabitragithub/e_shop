@@ -10,6 +10,16 @@ import VerifyEmail from "./pages/VerifyEmail"
 import Profile from "./pages/Profile"
 import Products from "./pages/Products"
 import Cart from "./pages/Cart"
+import Dashboard from "./pages/Dashboard"
+import AdminSales from "./pages/admin/AdminSales"
+import AddProduct from "./pages/admin/AddProduct"
+import AdminProduct from "./pages/admin/AdminProduct"
+import ShowUsersOrders from "./pages/admin/ShowUsersOrders"
+import AdminUsers from "./pages/admin/AdminUsers"
+import UserInfo from "./pages/admin/UserInfo"
+import ProtectedRoutes from "./components/ProtectedRoutes"
+import SingleProduct from "./pages/admin/SingleProduct"
+import AdminOrders from "./pages/admin/AdminOrders"
 
 const router = createBrowserRouter([
   {
@@ -34,15 +44,53 @@ const router = createBrowserRouter([
   },
   {
     path: "/profile/:userId",
-    element: <><Navbar /><Profile /></>
+    element: <ProtectedRoutes><Navbar /><Profile /></ProtectedRoutes>
   },
   {
     path: "/products",
     element: <><Navbar /><Products /></>
   },
   {
+    path: "/products/:Id",
+    element: <><Navbar /><SingleProduct /></>
+  },
+  {
     path: "/cart",
-    element: <><Navbar /><Cart /></>,
+    element: <ProtectedRoutes><Navbar /><Cart /></ProtectedRoutes>,
+  },
+  {
+    path: "/dashboard",
+    element: <ProtectedRoutes adminOnly={true}><Navbar /><Dashboard /></ProtectedRoutes>,
+    children: [
+      {
+        path: "sales",
+        element: <AdminSales />,
+      },
+      {
+        path: "add-product",
+        element: <AddProduct />,
+      },
+      {
+        path: "products",
+        element: <AdminProduct />,
+      },
+      {
+        path: "orders",
+        element: <AdminOrders />,
+      },
+      {
+        path: "users/orders/:userId",
+        element: <ShowUsersOrders />,
+      },
+      {
+        path: "users",
+        element: <AdminUsers />,
+      },
+      {
+        path: "user/:Id",
+        element: <UserInfo />,
+      },
+    ]
   }
 ])
 

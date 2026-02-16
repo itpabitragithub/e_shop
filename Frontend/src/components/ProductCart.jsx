@@ -13,7 +13,7 @@ const ProductCart = ({ product, loading }) => {
     const { productImg, productPrice, productName } = product
     const accessToken = localStorage.getItem('token')
     const dispatch = useDispatch()
-    // const navigate = useNavigate()
+    const navigate = useNavigate()
 
     const addToCart = async(productId) => {
         if(!productId){
@@ -44,7 +44,10 @@ const ProductCart = ({ product, loading }) => {
         <div className='shadow-lg rounded-lg overflow-hidden h-max'>
             <div className='w-full h-full overflow-hidden aspect-square'>
                 {
-                    loading ? <Skeleton className='w-full h-full rounded-lg' /> : <img src={productImg[0]?.url} alt={product.name} className='w-full h-full transition-transform duration-300 hover:scale-105' />
+                    loading ? <Skeleton className='w-full h-full rounded-lg' /> : <img
+                    onClick={() => navigate(`/products/${product._id}`)}
+                    src={productImg[0]?.url} alt={product.name}
+                    className='w-full h-full transition-transform duration-300 hover:scale-105 cursor-pointer' />
                 }
             </div>
             {
