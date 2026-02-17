@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser')
 const userRoutes = require('./routes/userRoute')
 const productRoutes = require('./routes/productRoute')
 const cartRoute = require('./routes/cartRoute')
+const orderRoute = require('./routes/orderRoute')
 
 const connectDB = require('./config/connectDB')
 const UserModel = require('./models/user.model')
@@ -32,6 +33,9 @@ connectDB()
 app.use('/api/user', userRoutes)
 app.use('/api/product', productRoutes)
 app.use('/api/cart', cartRoute)
+app.use('/api/orders', orderRoute)
+
+
 app.get('/', (req, res) => {  
     res.json({ 
         message: "Server is running Properly"

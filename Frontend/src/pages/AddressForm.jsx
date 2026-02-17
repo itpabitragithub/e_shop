@@ -43,6 +43,8 @@ function AddressForm() {
     const total = subtotal + shipping + tax;
 
     console.log(cart);
+
+    
     
 
     return (
