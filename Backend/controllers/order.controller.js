@@ -107,4 +107,24 @@ const verifyPayment = async (req, res) => {
     }
 }
 
-module.exports = { createOrder, verifyPayment }
+const getMyOrders = async (req, res) => {
+    try {
+        const userId = req.user._id
+        const orders = await OrderModel.find({user: userId})
+        .populate({path: "products.product", select: "productName productPrice productImage"})
+        .populate("user", "firstName lastName email")
+        res.status(200).json({
+            success: true,
+            count: orders.length,
+            orders,
+        })
+    } catch (error) {
+        console.log("❌ Error fetching user orders:", error);
+        res.status(500).json({
+            success: false,
+            message: "error.message"
+        })
+    }
+}
+
+module.exports = { createOrder, verifyPayment, getMyOrders }
