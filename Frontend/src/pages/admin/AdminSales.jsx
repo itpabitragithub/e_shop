@@ -1,7 +1,7 @@
-import { Card, CardHeader, CardTitle } from '@/components/ui/card'
-import { AreaChart } from 'lucide-react'
-import { Tooltip } from 'radix-ui'
-import React from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts'
 
 function AdminSales() {
   const [sales, setSales] = useState({
@@ -63,7 +63,7 @@ function AdminSales() {
         </Card>
 
         {/* Sales chart */}
-        <Card className='lg:col-span-2'>
+        <Card className='lg:col-span-4'>
           <CardHeader>
             <CardTitle>Sales (Last 30 Days)</CardTitle>
           </CardHeader>
