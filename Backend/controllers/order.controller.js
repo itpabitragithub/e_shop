@@ -128,7 +128,7 @@ const getMyOrders = async (req, res) => {
 }
 
 // Admin Only 
-const getUserOrder= async (req, res) => {
+const getUserOrders= async (req, res) => {
     try{
         const {userId} = req.params; // userId will be come from URL
         const orders = await OrderModel.find({user: userId})
@@ -157,7 +157,7 @@ const getAllOrdersAdmin= async (req, res) => {
         .sort({createdAt: -1}) // sort by createdAt in descending order
         .populate("products.productId", "productName productPrice productImg")
         .populate("user", "firstName lastName email")
-        
+
         res.status(200).json({
             success: true,
             count: orders.length,
@@ -173,4 +173,4 @@ const getAllOrdersAdmin= async (req, res) => {
     }
 }
 
-module.exports = { createOrder, verifyPayment, getMyOrders }
+module.exports = { createOrder, verifyPayment, getMyOrders, getAllOrdersAdmin, getUserOrders }
