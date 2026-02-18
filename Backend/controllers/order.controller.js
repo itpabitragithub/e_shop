@@ -2,6 +2,7 @@ const OrderModel = require('../models/order.model')
 const razorpayInstance = require('../config/Razorpay')
 const CartModel = require('../models/cart.model')
 const crypto = require('crypto')
+const UserModel = require('../models/user.model')
 
 const createOrder = async (req, res) => {
     try {
@@ -173,4 +174,55 @@ const getAllOrdersAdmin= async (req, res) => {
     }
 }
 
-module.exports = { createOrder, verifyPayment, getMyOrders, getAllOrdersAdmin, getUserOrders }
+const getSalesData = async (req, res) => {
+    try{
+        const totalUsers = await UserModel.countDocuments({})
+        const totalOrders = await OrderModel.countDocuments({})
+        const totalProducts = await ProductModel.countDocuments({status: "Paid"})
+
+        // Total sales amount
+        const totalSaleAgg = await OrderModel.aggregate([
+            { $match: { status: "Paid" } },
+            { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
+        ])
+
+        //  Sales grouped by date (last 30 days)
+        const thirtyDaysAgo = new Date()
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+        const salesByDate = await OrderModel.aggregate([
+            { $match: {status: "Paid", createdAt: { $gte: thirtyDaysAgo } } },
+            { $group: { 
+                _id: { 
+                    $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } 
+                }, 
+                amount: { $sum: "$amount" } } },
+            { $sort: { _id: 1 } }
+        ])
+        console.log(salesByDate);
+
+        const formattedSales = salesByDate.map((item) => ({
+            date: item._id.date,
+            amount: item.amount
+        }))
+        console.log(formattedSales);
+
+        res.status(200).json({
+            success: true,
+            totalUsers,
+            totalOrders,
+            totalProducts,
+            totalSales: totalSaleAgg[0].totalAmount,
+            sales:formattedSales,
+        })
+    }
+    catch(error){
+        console.log("Error fetching sales data:", error);
+        res.status(500).json({
+            success: false,
+            message: "error.message"
+        })
+    }
+}
+
+module.exports = { createOrder, verifyPayment, getMyOrders, getAllOrdersAdmin, getUserOrders, getSalesData }
