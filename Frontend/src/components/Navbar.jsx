@@ -23,7 +23,7 @@ function Navbar() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            if(response.data.success){
+            if(response.data.success){ 
                 dispatch(clearUser());
                 toast.success(response.data.message);
             }
@@ -38,7 +38,9 @@ function Navbar() {
             <div className='max-w-7xl mx-auto flex items-center justify-between py-0.5 px-1'>
                 {/* logo section */}
                 <div>
-                    <img src="/cart.png" alt="" className='w-[80px]' /> 
+                    <Link to={"/"}>
+                        <img src="/cart.png" alt="" className='w-[80px]' /> 
+                    </Link>
                 </div>
                 {/* navigation links */}
                 <nav className='flex items-center gap-6'>
