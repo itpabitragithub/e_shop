@@ -127,4 +127,50 @@ const getMyOrders = async (req, res) => {
     }
 }
 
+// Admin Only 
+const getUserOrder= async (req, res) => {
+    try{
+        const {userId} = req.params; // userId will be come from URL
+        const orders = await OrderModel.find({user: userId})
+        .populate({
+            path: "products.productId", 
+            select: "productName productPrice productImg"
+        }) // fetch product details
+        .populate("user", "firstName lastName email") // fetch user info
+        res.status(200).json({
+            success: true,
+            count: orders.length,
+            orders,
+        })
+    }catch(error){
+        console.log("❌ Error fetching user orders:", error);
+        res.status(500).json({
+            success: false,
+            message: "error.message"
+        })
+    }
+}
+
+const getAllOrdersAdmin= async (req, res) => {
+    try{
+        const orders = await OrderModel.find()
+        .sort({createdAt: -1}) // sort by createdAt in descending order
+        .populate("products.productId", "productName productPrice productImg")
+        .populate("user", "firstName lastName email")
+        
+        res.status(200).json({
+            success: true,
+            count: orders.length,
+            orders,
+        })
+    }catch(error){
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "error.message",
+            error: error.message
+        })
+    }
+}
+
 module.exports = { createOrder, verifyPayment, getMyOrders }
