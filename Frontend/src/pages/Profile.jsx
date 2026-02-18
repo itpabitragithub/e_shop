@@ -23,6 +23,7 @@ import { useParams } from 'react-router-dom'
 import userLogo from "../assets/user.png"
 import { toast } from 'sonner'
 import axios from 'axios'
+import MyOrder from './MyOrder'
 
 function Profile() {
     const { user } = useSelector((store) => store.user)
@@ -261,30 +262,9 @@ function Profile() {
                         </div>
                     </TabsContent>
                     <TabsContent value="orders">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Password</CardTitle>
-                                <CardDescription>
-                                    Change your password here. After saving, you&apos;ll be logged
-                                    out.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="grid gap-6">
-                                <div className="grid gap-3">
-                                    <Label htmlFor="tabs-demo-current">Current password</Label>
-                                    <Input id="tabs-demo-current" type="password" />
-                                </div>
-                                <div className="grid gap-3">
-                                    <Label htmlFor="tabs-demo-new">New password</Label>
-                                    <Input id="tabs-demo-new" type="password" />
-                                </div>
-                            </CardContent>
-                            <CardFooter>
-                                <Button>Save password</Button>
-                            </CardFooter>
-                        </Card>
-                    </TabsContent>
-                </Tabs>
+                         <MyOrder />
+                    </TabsContent>  
+                </Tabs> 
             </div>
         </div>
     )
