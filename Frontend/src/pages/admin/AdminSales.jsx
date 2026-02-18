@@ -4,7 +4,7 @@ import axios from 'axios'
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts'
 
 function AdminSales() {
-  const [sales, setSales] = useState({
+  const [stateData, setStateData] = useState({
     totalUsers: 0,
     totalOrders: 0,
     totalProducts: 0,
@@ -15,14 +15,14 @@ function AdminSales() {
   const fetchSates = async () => {
     try {
       const accesstoken = localStorage.getItem('token')
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/order/sales`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/orders/sales`, {
         headers: {
           Authorization: `Bearer ${accesstoken}`
         }
       })
 
       if (response.data.success) {
-        setSales(response.data.salesData)
+        setStateData(response.data.salesData)
       }
     } catch (error) {
       console.log("Error fetching sales data:", error);
@@ -41,35 +41,35 @@ function AdminSales() {
           <CardHeader>
             <CardTitle>Total Users</CardTitle>
           </CardHeader>
-          <CardContent className='text-2xl font-bold'>{sales.totalUsers}</CardContent>
+          <CardContent className='text-2xl font-bold'>{stateData.totalUsers}</CardContent>
         </Card>
         <Card className='bg-purple-500 text-white shadow'>
           <CardHeader>
             <CardTitle>Total Products</CardTitle>
           </CardHeader>
-          <CardContent className='text-2xl font-bold'>{sales.totalProducts}</CardContent>
+          <CardContent className='text-2xl font-bold'>{stateData.totalProducts}</CardContent>
         </Card>
         <Card className='bg-purple-500 text-white shadow'>
           <CardHeader>
             <CardTitle>Total Orders</CardTitle>
           </CardHeader>
-          <CardContent className='text-2xl font-bold'>{sales.totalOrders}</CardContent>
+          <CardContent className='text-2xl font-bold'>{stateData.totalOrders}</CardContent>
         </Card>
         <Card className='bg-purple-500 text-white shadow'>
           <CardHeader>
             <CardTitle>Total Sales</CardTitle>
           </CardHeader>
-          <CardContent className='text-2xl font-bold'>{sales.totalSales}</CardContent>
-        </Card>
+          <CardContent className='text-2xl font-bold'>{stateData.totalSales}</CardContent>
+        </Card>  
 
         {/* Sales chart */}
         <Card className='lg:col-span-4'>
           <CardHeader>
             <CardTitle>Sales (Last 30 Days)</CardTitle>
           </CardHeader>
-          <CardContent style={{ height: '300px' }}>
+          <CardContent style={{height: 300}}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={sales.sales}>
+                <AreaChart data={stateData.sales}>
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
@@ -79,7 +79,7 @@ function AdminSales() {
           </CardContent>
       </Card>
     </div>
-  </div>
+  </div> 
 )
 }
 

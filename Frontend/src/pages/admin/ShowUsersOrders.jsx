@@ -9,7 +9,7 @@ function ShowUsersOrders() {
 
   const getUserOrders = async () => {
     const accesstoken = localStorage.getItem('token')
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/order/user-order/${params.userId}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/order/user-order/${params.userId}`, {
       headers: {
         Authorization: `Bearer ${accesstoken}`
       }

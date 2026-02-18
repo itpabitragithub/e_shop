@@ -183,8 +183,10 @@ const getSalesData = async (req, res) => {
         // Total sales amount
         const totalSaleAgg = await OrderModel.aggregate([
             { $match: { status: "Paid" } },
-            { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
+            { $group: { _id: null, total: { $sum: "$amount" } } }
         ])
+
+        const totalSales = totalSaleAgg[0]?.total || 0
 
         //  Sales grouped by date (last 30 days)
         const thirtyDaysAgo = new Date()
@@ -196,23 +198,25 @@ const getSalesData = async (req, res) => {
                 _id: { 
                     $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } 
                 }, 
-                amount: { $sum: "$amount" } } },
+                amount: { $sum: "$amount" } 
+            } 
+        },
             { $sort: { _id: 1 } }
         ])
         console.log(salesByDate);
 
         const formattedSales = salesByDate.map((item) => ({
-            date: item._id.date,
+            date: item._id,
             amount: item.amount
         }))
         console.log(formattedSales);
 
-        res.status(200).json({
+        res.json({
             success: true,
             totalUsers,
             totalOrders,
             totalProducts,
-            totalSales: totalSaleAgg[0].totalAmount,
+            totalSales,
             sales:formattedSales,
         })
     }
