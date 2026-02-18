@@ -54,7 +54,7 @@ function AdminUsers() {
             </div>
             <div className='grid grid-cols gap-7 mt-7'>
                 {
-                    filteredUsers.map((user, index) => {
+                    filteredUsers.map((user, index) => { 
                         return (
                             <div key={index} className='bg-purple-100 rounded-lg p-5'>
                                 <div className='flex items-center gap-2'>
@@ -73,7 +73,7 @@ function AdminUsers() {
                                 </div>
                                 <div className='flex mt-3 gap-3'>
                                     <Button onClick={() => navigate(`/dashboard/users/${user?._id}`)} variant='outline'><Edit/>Edit</Button>
-                                    <Button><Eye/>show Order</Button>
+                                    <Button onClick={() => navigate(`/dashboard/users/orders/${user?._id}`)}><Eye/>show Order</Button>
                                 </div>
                             </div>
                         )
