@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { addAddress, deleteAddress, setSelectedAddress } from '../redux/productSlice';
+import { addAddress, deleteAddress, setCart, setSelectedAddress } from '../redux/productSlice';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useNavigate } from 'react-router-dom';
@@ -282,7 +282,7 @@ function AddressForm() {
                 </div>
                 {/* Right side - Order Summary */}
                 <div className='sticky top-10'>
-                    <Card className='w-full'>
+                    <Card className='w-full'> 
                         <CardHeader>
                             <CardTitle>Order Summary</CardTitle>
                         </CardHeader>
