@@ -10,47 +10,48 @@ const cartRoute = require('./routes/cartRoute')
 const orderRoute = require('./routes/orderRoute')
 
 const connectDB = require('./config/connectDB')
-const UserModel = require('./models/user.model')
-const SessionModel = require('./models/session.model')
-const CartModel = require('./models/cart.model')
-const ProductModel = require('./models/product.model') 
 
+const app = express()
 
-const app = express() 
+// ✅ Allowed origins
 const allowedOrigins = [
-    "http://localhost:5173",
-    "https://e-shop-1m8q.vercel.app"
-  ];
-  
-  app.use(cors({
-    origin: function(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true
-  }));
-app.use(express.json()) // read and parse JSON data sent from the client to your Express server.
+  "http://localhost:5173",
+  "https://e-shop-1m8q.vercel.app"
+]
+
+// ✅ CORS CONFIG (PRE-FLIGHT SAFE)
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true)
+    }
+    return callback(null, false)
+  },
+  credentials: true,
+  methods: ["GET","POST","PUT","DELETE","PATCH","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"]
+}))
+
+// ✅ VERY IMPORTANT — HANDLE PREFLIGHT
+app.options("*", cors())
+
+app.use(express.json())
 app.use(cookieParser())
+
 connectDB()
 
+// Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/product', productRoutes)
 app.use('/api/cart', cartRoute)
 app.use('/api/orders', orderRoute)
 
-
-app.get('/', (req, res) => {  
-    res.json({ 
-        message: "Server is running Properly"
-    })
+app.get('/', (req, res) => {
+  res.json({ message: "Server is running Properly" })
 })
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
-    console.log(`Server running at port ${PORT}`);
-
+  console.log(`Server running at port ${PORT}`)
 })
