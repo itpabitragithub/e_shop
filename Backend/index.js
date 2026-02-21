@@ -17,10 +17,21 @@ const ProductModel = require('./models/product.model')
 
 
 const app = express() 
-app.use(cors({
-    credentials: true, 
-    origin: "http://localhost:5173"
-}))
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://e-shop-1m8q.vercel.app"
+  ];
+  
+  app.use(cors({
+    origin: function(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true
+  }));
 app.use(express.json()) // read and parse JSON data sent from the client to your Express server.
 app.use(cookieParser())
 connectDB()
