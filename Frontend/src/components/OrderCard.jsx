@@ -13,7 +13,7 @@ function OrderCard({userOrders}) {
                     <h1 className='text-2xl font-bold'>Orders</h1>
                 </div>
                 {
-                    userOrders?.length === 0 ? (
+                    !userOrders || userOrders?.length === 0 ? (
                         <p className='text-gray-500 space-y-6 text-2xl'>No Orders found for this user yet. Start shopping now!</p>
                     ) : (
                         <div className='space-y-6 w-full'>
@@ -26,7 +26,7 @@ function OrderCard({userOrders}) {
                                                 <span className='text-gray-600'>{order._id}</span>
                                             </h2>
                                             <p className='text-gray-600 text-sm'>Amount:{" "}
-                                                <span className='font-bold'>{order.currency} {order.amount.toFixed(2)}</span>
+                                                <span className='font-bold'>{order.currency} {Number(order.amount)?.toFixed(2) ?? '0.00'}</span>
                                             </p>
                                         </div>
 
@@ -41,22 +41,23 @@ function OrderCard({userOrders}) {
                                                     Email: {order.user?.email || "N/A"}
                                                 </p>
                                             </div>
-                                            <sapn className={`${order.status === "paid" ? "bg-green-500" : order.status === "Failed" ? "bg-red-500" : "bg-orange-300"} text-white px-2 py-1 rounded-lg`}>{order.status}</sapn>
+                                            <span className={`${order.status === "Paid" ? "bg-green-500" : order.status === "Failed" ? "bg-red-500" : "bg-orange-300"} text-white px-2 py-1 rounded-lg`}>{order.status}</span>
                                         </div>
 
-                                        {/* Productz */}
+                                        {/* Products */}
                                         <div>
                                             <h3 className='font-medium mb-2'>Products:</h3>
                                             <ul>
                                                 {
-                                                    order.products.map((product, index) => (
+                                                    (order.product || order.products || []).length > 0
+                                                        ? (order.product || order.products || []).map((item, index) => (
                                                         <li key={index} className='flex items-center justify-between bg-gray-100 p-2 rounded-lg'>
-                                                            <img onClick={() => navigate(`/product/${product.productId._id}`)} className='w-16 cursor-pointer' src={product.productId?.productImg?.[0].url} alt="" />
-                                                            <span className='w-[100px] line-clamp-2'>{product.productId?.productName}</span>
-                                                            <span>{product?.productId._id}</span>
-                                                            <span className='font-medium'>₹{product.productId?.productPrice} * {product.quantity}</span>
+                                                            <img onClick={() => navigate(`/product/${item.productId?._id}`)} className='w-16 cursor-pointer' src={item.productId?.productImg?.[0]?.url} alt="" />
+                                                            <span className='w-[100px] line-clamp-2'>{item.productId?.productName}</span>
+                                                            <span className='text-xs text-gray-500 truncate max-w-[80px]'>{item.productId?._id}</span>
+                                                            <span className='font-medium'>₹{item.productId?.productPrice} × {item.quantity}</span>
                                                         </li>
-                                                    ))
+                                                    )) : <li className='text-gray-500'>No products in this order</li>
                                                 }
                                             </ul>
                                         </div>

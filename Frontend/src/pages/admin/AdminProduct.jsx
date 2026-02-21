@@ -11,7 +11,6 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { useDispatch, useSelector } from 'react-redux'
-import { Card } from '@/components/ui/card'
 import { setProducts } from '@/redux/productSlice'
 import axios from 'axios'
 import { toast } from 'sonner'
@@ -248,79 +247,78 @@ function AdminProduct() {
                     {products.length === 0 ? 'No products found' : 'No products match your search'}
                 </div>
             ) : (
-                <div className='grid grid-cols-1 gap-4'>
-                    {filteredProducts.map((product) => (
-                        <Card 
-                            key={product._id} 
-                            className='px-6 py-4 hover:shadow-lg transition-shadow cursor-pointer'
-                            onClick={() => navigate(`/products/${product._id}`)}
-                        >
-                            <div className='flex justify-between items-center gap-4'>
-                                <div className='flex items-center gap-4 flex-1'>
-                                    {product.productImg && product.productImg.length > 0 ? (
-                                        <img 
-                                            src={product.productImg[0].url} 
-                                            alt={product.productName}
-                                            className='w-20 h-20 object-cover rounded-lg'
-                                        />
-                                    ) : (
-                                        <div className='w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400'>
-                                            No Image
-                                        </div>
-                                    )}
-                                    <div className='flex-1'>
-                                        <h3 className='font-semibold text-lg'>{product.productName}</h3>
-                                        <p className='text-sm text-gray-600 line-clamp-2'>{product.productDesc}</p>
-                                        <div className='flex gap-4 mt-2 text-sm text-gray-500'>
-                                            {product.category && (
-                                                <span>Category: {product.category}</span>
+                <div className='bg-white rounded-lg shadow overflow-hidden'>
+                    <div className='overflow-x-auto'>
+                        <table className='w-full'>
+                            <thead>
+                                <tr className='border-b bg-gray-50'>
+                                    <th className='text-left py-3 px-4 font-semibold text-gray-700'>Image</th>
+                                    <th className='text-left py-3 px-4 font-semibold text-gray-700'>Product</th>
+                                    <th className='text-left py-3 px-4 font-semibold text-gray-700'>Category</th>
+                                    <th className='text-left py-3 px-4 font-semibold text-gray-700'>Brand</th>
+                                    <th className='text-left py-3 px-4 font-semibold text-gray-700'>Price</th>
+                                    <th className='text-right py-3 px-4 font-semibold text-gray-700'>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredProducts.map((product) => (
+                                    <tr
+                                        key={product._id}
+                                        className='border-b hover:bg-gray-50 transition-colors cursor-pointer'
+                                        onClick={() => navigate(`/products/${product._id}`)}
+                                    >
+                                        <td className='py-3 px-4'>
+                                            {product.productImg && product.productImg.length > 0 ? (
+                                                <img
+                                                    src={product.productImg[0].url}
+                                                    alt={product.productName}
+                                                    className='w-14 h-14 object-cover rounded-lg'
+                                                />
+                                            ) : (
+                                                <div className='w-14 h-14 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs'>
+                                                    No Image
+                                                </div>
                                             )}
-                                            {product.brand && (
-                                                <span>Brand: {product.brand}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='text-right flex flex-col items-end gap-2'>
-                                    <p className='font-bold text-xl text-purple-600'>
-                                        ${product.productPrice || 0}
-                                    </p>
-                                    <div className='flex gap-2'>
-                                        <Button 
-                                            variant="outline" 
-                                            size="sm"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                navigate(`/products/${product._id}`)
-                                            }}
-                                        >
-                                            View
-                                        </Button>
-                                        <Button 
-                                            variant="outline" 
-                                            size="sm"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleEditClick(product)
-                                            }}
-                                        >
-                                            <Edit className='h-4 w-4' />
-                                        </Button>
-                                        <Button 
-                                            variant="destructive" 
-                                            size="sm"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleDeleteClick(product)
-                                            }}
-                                        >
-                                            <Trash2 className='h-4 w-4' />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
-                    ))}
+                                        </td>
+                                        <td className='py-3 px-4'>
+                                            <div>
+                                                <p className='font-semibold text-gray-900 line-clamp-1'>{product.productName}</p>
+                                                <p className='text-sm text-gray-500 line-clamp-2 max-w-md'>{product.productDesc}</p>
+                                            </div>
+                                        </td>
+                                        <td className='py-3 px-4 text-gray-600'>{product.category || '—'}</td>
+                                        <td className='py-3 px-4 text-gray-600'>{product.brand || '—'}</td>
+                                        <td className='py-3 px-4 font-bold text-purple-600'>${product.productPrice ?? 0}</td>
+                                        <td className='py-3 px-4 text-right'>
+                                            <div className='flex gap-2 justify-end' onClick={(e) => e.stopPropagation()}>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => navigate(`/products/${product._id}`)}
+                                                >
+                                                    View
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleEditClick(product)}
+                                                >
+                                                    <Edit className='h-4 w-4' />
+                                                </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteClick(product)}
+                                                >
+                                                    <Trash2 className='h-4 w-4' />
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 

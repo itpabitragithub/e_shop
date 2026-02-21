@@ -253,7 +253,7 @@ function Profile() {
                                                 />
                                             </div>
                                         </div>
-                                        <Button type='submit' className='w-full mt-4 bg-blue-500 text-white hover:bg-blue-600 font-semibold py-2 rounded-lg'>
+                                        <Button type='submit' className='w-full mt-4 bg-pink-500 text-white hover:bg-pink-600 font-semibold py-2 rounded-lg'>
                                             Update Profile
                                         </Button>
                                     </form>

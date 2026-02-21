@@ -30,9 +30,9 @@ function AdminUsers() {
     }
 
     const filteredUsers = users.filter((user) => {
-        return user?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) || user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        if (user?.email?.toLowerCase() === 'admin@admin.com') return false
+        return user?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) || user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
-
     })
 
     useEffect(() => {
@@ -40,7 +40,7 @@ function AdminUsers() {
     }, [])
 
     return (
-        <div className='pl-[350px] py-20 pr-20 mx-auto px-4'>
+        <div className='pl-[250px] py-20 pr-20 mx-auto px-4'>
             <h1 className='font-bold text-2xl'>User Management</h1>
             <p>View and manage registered users</p>
             <div className='flex relative w-[300px] mt-6'>
@@ -52,7 +52,7 @@ function AdminUsers() {
                 placeholder='Search users...' 
                 className='w-full pl-10'/>
             </div>
-            <div className='grid grid-cols gap-7 mt-7'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7 mt-7'>
                 {
                     filteredUsers.map((user, index) => { 
                         return (

@@ -79,7 +79,7 @@ function AddProduct() {
 
     }
     return (
-        <div className='pl-[350px] py-20 pr-20 mx-auto px-4 bg-gray-100'>
+        <div className='pl-[200px] py-20 pr-20 mx-auto px-4 bg-gray-100'>
             <Card className='w-full my-20'>
                 <CardHeader>
                     <CardTitle>Add Product</CardTitle>

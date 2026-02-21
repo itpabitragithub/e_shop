@@ -35,7 +35,7 @@ function AdminOrders() {
       <h1 className='text-3xl font-bold mb-6'>Admin - All Orders</h1>
 
       {
-        orders.length === 0 ? (
+        !orders?.length ? (
           <p className='text-gray-500'>No orders found</p>
         ) : (
           <div className='overflow-x-auto'>
@@ -52,17 +52,17 @@ function AdminOrders() {
               </thead>
               <tbody>
                 {
-                  orders.map((order) => (
+                  (orders || []).map((order) => (
                     <tr key={order._id} className='hover:bg-gray-50'>
                       <td className='px-4 py-2 border'>{order._id}</td>
                       <td className='px-4 py-2 border'>
-                        {order.user.firstName} <br />
-                        <span className='text-gray-500 text-xs'>{order.user.lastName}</span>
+                        {order.user?.firstName ?? '—'} <br />
+                        <span className='text-gray-500 text-xs'>{order.user?.lastName}</span>
                       </td>
                       <td className='px-4 py-2 border'>
-                        {order.products.map((p, idx) => (
-                          <div key={idx}  className='px-4 py-2 border'>
-                            {p.product.name} x {p.quantity}
+                        {(order.product || []).map((p, idx) => (
+                          <div key={idx} className='px-4 py-2 border'>
+                            {p.productId?.productName ?? '—'} x {p.quantity}
                           </div>
                         ))}
                       </td>
