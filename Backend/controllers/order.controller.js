@@ -4,6 +4,7 @@ const razorpayInstance = require('../config/Razorpay')
 const CartModel = require('../models/cart.model')
 const crypto = require('crypto')
 const UserModel = require('../models/user.model')
+const PromoCodeModel = require('../models/promoCode.model')
 
 function normalizeAmount(amount) {
     const num = Number(amount);
@@ -23,7 +24,7 @@ function normalizeAmount(amount) {
 
 const createOrder = async (req, res) => {
     try {
-        const { products, amount, tax, shipping, currency } = req.body
+        const { products, amount, tax, shipping, currency, promoCode, discountAmount } = req.body
         const normalizedAmount = normalizeAmount(amount)
         const options = {
             amount: normalizedAmount,
@@ -33,6 +34,17 @@ const createOrder = async (req, res) => {
 
         const razorpayOrder = await razorpayInstance.orders.create(options)
 
+        // Update promo code usage if applicable
+        if (promoCode) {
+            await PromoCodeModel.findOneAndUpdate(
+                { code: promoCode },
+                { 
+                    $inc: { usedCount: 1 },
+                    $addToSet: { usedBy: req.user._id }
+                }
+            )
+        }
+
         // save order to database (schema uses 'product' not 'products')
         const newOrder = await OrderModel.create({
             user: req.user._id,
@@ -41,6 +53,8 @@ const createOrder = async (req, res) => {
             tax,
             shipping,
             currency: currency || "INR",
+            promoCode: promoCode || null,
+            discountAmount: discountAmount || 0,
             razorpayOrderId: razorpayOrder.id,
         })
 
@@ -130,7 +144,7 @@ const getMyOrders = async (req, res) => {
     try {
         const userId = req.user._id
         const orders = await OrderModel.find({user: userId})
-        .populate({path: "products.product", select: "productName productPrice productImage"})
+        .populate({path: "product.productId", select: "productName productPrice productImg"})
         .populate("user", "firstName lastName email")
         res.status(200).json({
             success: true,
@@ -152,7 +166,7 @@ const getUserOrders= async (req, res) => {
         const {userId} = req.params; // userId will be come from URL
         const orders = await OrderModel.find({user: userId})
         .populate({
-            path: "products.productId", 
+            path: "product.productId", 
             select: "productName productPrice productImg"
         }) // fetch product details
         .populate("user", "firstName lastName email") // fetch user info
@@ -174,7 +188,7 @@ const getAllOrdersAdmin= async (req, res) => {
     try{
         const orders = await OrderModel.find()
         .sort({createdAt: -1}) // sort by createdAt in descending order
-        .populate("products.productId", "productName productPrice productImg")
+        .populate("product.productId", "productName productPrice productImg")
         .populate("user", "firstName lastName email")
 
         res.status(200).json({
