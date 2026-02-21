@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import userLogo from '@/assets/user.png'
 import { useSelector, useDispatch } from 'react-redux';
 import { Button } from '@/components/ui/button';
-import { Plus, Minus, Trash2, ShoppingCartIcon, X } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCartIcon } from 'lucide-react';
 import { setCart } from '@/redux/productSlice';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -13,16 +13,12 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Cart = () => {
     const {cart} = useSelector((store) => store.product);
-    const [promoCode, setPromoCode] = useState('');
-    const [appliedPromoCode, setAppliedPromoCode] = useState(null);
-    const [discountAmount, setDiscountAmount] = useState(0);
-    const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+    
 
     const subtotal = cart?.totalPrice;
     const shipping = subtotal > 299 ? 0 : 10;
     const tax = subtotal * 0.05;
-    const totalBeforeDiscount = subtotal + shipping + tax;
-    const total = totalBeforeDiscount - discountAmount;
+    const total = subtotal + shipping + tax;
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -44,13 +40,6 @@ const Cart = () => {
             if (response.data.success) {
                 dispatch(setCart(response.data.cart));
                 toast.success('Quantity updated successfully');
-                // Re-validate promo code if applied
-                if (appliedPromoCode) {
-                    // Use setTimeout to ensure cart state is updated first
-                    setTimeout(() => {
-                        handleApplyPromoCode(appliedPromoCode.code);
-                    }, 100);
-                }
             }
         }
         catch (error) {
@@ -85,20 +74,10 @@ const Cart = () => {
                 if (response.data.cart) {
                     dispatch(setCart(response.data.cart));
                     toast.success('Item removed from cart');
-                    // Re-validate promo code if applied
-                    if (appliedPromoCode) {
-                        setTimeout(() => {
-                            handleApplyPromoCode(appliedPromoCode.code);
-                        }, 100);
-                    }
                 } else {
                     // If cart is empty or null, set empty cart
                     dispatch(setCart({ items: [], totalPrice: 0 }));
                     toast.success('Item removed from cart');
-                    // Clear promo code if cart is empty
-                    setAppliedPromoCode(null);
-                    setDiscountAmount(0);
-                    setPromoCode('');
                 }
             } else {
                 toast.error('Failed to remove item from cart');
@@ -109,84 +88,6 @@ const Cart = () => {
             const errorMessage = error.response?.data?.message || error.message || 'Failed to remove item';
             toast.error(errorMessage);
         }
-    }
-
-    const handleApplyPromoCode = async (codeToApply = null) => {
-        const code = codeToApply || promoCode;
-        
-        console.log('handleApplyPromoCode called with:', { code, codeToApply, promoCode });
-        
-        if (!code || !code.trim()) {
-            toast.error('Please enter a promo code');
-            return;
-        }
-
-        if (!accessToken) {
-            toast.error('Please login to apply promo code');
-            navigate('/login');
-            return;
-        }
-
-        setIsApplyingPromo(true);
-        try {
-            // Recalculate totals based on current cart state
-            const currentSubtotal = cart?.totalPrice || 0;
-            const currentShipping = currentSubtotal > 299 ? 0 : 10;
-            const currentTax = currentSubtotal * 0.05;
-            const currentTotalBeforeDiscount = currentSubtotal + currentShipping + currentTax;
-            
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-            console.log('API URL:', apiUrl);
-            console.log('Request payload:', {
-                code: code.trim(),
-                totalAmount: currentTotalBeforeDiscount
-            });
-            
-            const response = await axios.post(
-                `${apiUrl}/api/promo-code/validate`,
-                {
-                    code: code.trim(),
-                    totalAmount: currentTotalBeforeDiscount
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
-
-            console.log('Promo code response:', response.data);
-
-            if (response.data.success) {
-                setAppliedPromoCode(response.data.promoCode);
-                setDiscountAmount(response.data.discountAmount);
-                if (!codeToApply) {
-                    setPromoCode(code.trim());
-                }
-                toast.success(response.data.message || 'Promo code applied successfully!');
-            }
-        } catch (error) {
-            console.error('Error applying promo code:', error);
-            console.error('Error details:', {
-                message: error.message,
-                response: error.response?.data,
-                status: error.response?.status
-            });
-            const errorMessage = error.response?.data?.message || error.message || 'Failed to apply promo code';
-            toast.error(errorMessage);
-            setAppliedPromoCode(null);
-            setDiscountAmount(0);
-        } finally {
-            setIsApplyingPromo(false);
-        }
-    }
-
-    const handleRemovePromoCode = () => {
-        setAppliedPromoCode(null);
-        setDiscountAmount(0);
-        setPromoCode('');
-        toast.success('Promo code removed');
     }
 
   return (
@@ -201,30 +102,23 @@ const Cart = () => {
                                 return <Card key={index} className='overflow-hidden'>
                                         <CardContent className='p-4 sm:p-6'>
                                             <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
-                                                <Link 
-                                                    to={`/products/${item?.productId?._id}`}
-                                                    className='flex items-center gap-4 flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity'
-                                                >
+                                                <div className='flex items-center gap-4 flex-1 min-w-0'>
                                                     <img 
                                                         src={item?.productId?.productImg?.[0]?.url || userLogo} 
                                                         alt={item?.productId?.productName} 
                                                         className='w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-md flex-shrink-0' 
                                                     />
                                                     <div className='flex-1 min-w-0'>
-                                                        <h1 className='font-semibold text-base sm:text-lg truncate hover:text-purple-600 transition-colors'>{item?.productId?.productName}</h1>
+                                                        <h1 className='font-semibold text-base sm:text-lg truncate'>{item?.productId?.productName}</h1>
                                                         <p className='text-gray-600 mt-1'>₹{item?.productId?.productPrice?.toLocaleString('en-IN')}</p>
                                                     </div>
-                                                </Link>
+                                                </div>
                                                 <div className='flex items-center gap-3 sm:gap-5 w-full sm:w-auto justify-between sm:justify-start'>
                                                     <div className='flex items-center gap-3 sm:gap-4'>
                                                         <Button 
                                                             size="sm"
                                                             variant="outline"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                                handleUpdateQuantity(item?.productId?._id, 'decrement');
-                                                            }}
+                                                            onClick={() => handleUpdateQuantity(item?.productId?._id, 'decrement')}
                                                             className='h-8 w-8 p-0'
                                                         >
                                                             <Minus className='w-4 h-4' />
@@ -233,11 +127,7 @@ const Cart = () => {
                                                         <Button 
                                                             size="sm"
                                                             variant="outline"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                                handleUpdateQuantity(item?.productId?._id, 'increment');
-                                                            }}
+                                                            onClick={() => handleUpdateQuantity(item?.productId?._id, 'increment')}
                                                             className='h-8 w-8 p-0'
                                                         >
                                                             <Plus className='w-4 h-4' />
@@ -286,81 +176,17 @@ const Cart = () => {
                                         <span>Tax(5%)</span>
                                         <span className='font-medium'>₹{tax?.toFixed(2)}</span>
                                     </div>
-                                    {appliedPromoCode && (
-                                        <>
-                                            <div className='flex justify-between text-green-600'>
-                                                <span>Discount ({appliedPromoCode.code})</span>
-                                                <span className='font-medium'>-₹{discountAmount?.toFixed(2)}</span>
-                                            </div>
-                                        </>
-                                    )}
                                     <Separator />
                                     <div className='flex justify-between font-bold text-lg'>
                                         <span>Total</span>
                                         <span>₹{total?.toFixed(2)?.toLocaleString('en-IN')}</span>
                                     </div>
                                     <div className='space-y-3 pt-4'>
-                                        {appliedPromoCode ? (
-                                            <div className='flex items-center justify-between p-2 bg-green-50 rounded-md border border-green-200'>
-                                                <div className='flex-1'>
-                                                    <p className='text-sm font-medium text-green-800'>{appliedPromoCode.code}</p>
-                                                    {appliedPromoCode.description && (
-                                                        <p className='text-xs text-green-600'>{appliedPromoCode.description}</p>
-                                                    )}
-                                                </div>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={handleRemovePromoCode}
-                                                    className='h-8 w-8 p-0 text-green-600 hover:text-green-700'
-                                                >
-                                                    <X className='w-4 h-4' />
-                                                </Button>
-                                            </div>
-                                        ) : (
-                                            <div className='flex space-x-2'>
-                                                <Input 
-                                                    placeholder='Promo code' 
-                                                    className='flex-1' 
-                                                    value={promoCode}
-                                                    onChange={(e) => setPromoCode(e.target.value)}
-                                                    onKeyPress={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            handleApplyPromoCode();
-                                                        }
-                                                    }}
-                                                />
-                                                <Button 
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        handleApplyPromoCode();
-                                                    }}
-                                                    disabled={isApplyingPromo || !promoCode.trim()}
-                                                >
-                                                    {isApplyingPromo ? 'Applying...' : 'Apply'}
-                                                </Button>
-                                            </div>
-                                        )}
-                                        <Button 
-                                            onClick={() => {
-                                                // Store promo code info in sessionStorage to pass to address page
-                                                if (appliedPromoCode) {
-                                                    sessionStorage.setItem('appliedPromoCode', JSON.stringify({
-                                                        code: appliedPromoCode.code,
-                                                        discountAmount: discountAmount
-                                                    }));
-                                                } else {
-                                                    sessionStorage.removeItem('appliedPromoCode');
-                                                }
-                                                navigate('/address');
-                                            }} 
-                                            className='w-full bg-pink-600 hover:bg-pink-700'
-                                        >
-                                            PLACE ORDER
-                                        </Button>
+                                        <div className='flex space-x-2'>
+                                            <Input placeholder='Promo code' className='flex-1' />
+                                            <Button variant="outline">Apply</Button>
+                                        </div>
+                                        <Button onClick={()=>navigate('/address')} className='w-full bg-pink-600 hover:bg-pink-700'>PLACE ORDER</Button>
                                         <Button variant="outline" className='w-full bg-transparent'>
                                             <Link to='/products'>Continue Shopping</Link>
                                         </Button>

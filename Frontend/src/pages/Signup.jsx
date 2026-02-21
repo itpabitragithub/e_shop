@@ -125,7 +125,7 @@ function Signup() {
                     </div>
                 </CardContent>
                 <CardFooter className="flex-col gap-2">
-                    <Button onClick={handleSubmit} type="submit" className="w-full cursor-pointer bg-pink-500 text-white hover:bg-pink-600">
+                    <Button onClick={handleSubmit} type="submit" className="w-full cursor-pointer bg-purple-700 text-white hover:bg-purple-800">
                         {loading?<><Loader2 className='w-4 h-4 text-white animate-spin' />Please wait...</>:"Signup"}
                     </Button>
                     <p className='text-center text-sm text-gray-500'>Already have an account? <Link to={"/login"} className='hover:underline cursor-pointer text-blue-800'>Login</Link></p>

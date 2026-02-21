@@ -1,5 +1,5 @@
 import { Label } from '@/components/ui/label';
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -41,28 +41,10 @@ function AddressForm() {
         setShowForm(false);
     }
 
-    const [appliedPromoCode, setAppliedPromoCode] = useState(null);
-    const [discountAmount, setDiscountAmount] = useState(0);
-
-    useEffect(() => {
-        // Get promo code from sessionStorage
-        const promoCodeData = sessionStorage.getItem('appliedPromoCode');
-        if (promoCodeData) {
-            try {
-                const promo = JSON.parse(promoCodeData);
-                setAppliedPromoCode(promo);
-                setDiscountAmount(promo.discountAmount || 0);
-            } catch (error) {
-                console.error('Error parsing promo code:', error);
-            }
-        }
-    }, []);
-
     const subtotal = cart.totalPrice;
     const shipping = subtotal > 50 ? 0 : 10;
     const tax = parseFloat((subtotal * 0.05).toFixed(2));
-    const totalBeforeDiscount = subtotal + shipping + tax;
-    const total = totalBeforeDiscount - discountAmount;
+    const total = subtotal + shipping + tax;
 
     console.log(cart);
 
@@ -79,9 +61,7 @@ function AddressForm() {
                 tax: tax,
                 amount: total,
                 shipping: shipping,
-                currency: "INR",
-                promoCode: appliedPromoCode?.code || null,
-                discountAmount: discountAmount || 0
+                currency: "INR"
             }, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
@@ -111,8 +91,6 @@ function AddressForm() {
                                 items: [],
                                 totalPrice: 0
                             }));
-                            // Clear promo code from sessionStorage after successful payment
-                            sessionStorage.removeItem('appliedPromoCode');
                             navigate("/order-success");
                         } else {
                             toast.error("❌ Payment verification failed !");
@@ -325,16 +303,10 @@ function AddressForm() {
                                 <span>Tax</span>
                                 <span>₹{tax}</span>
                             </div>
-                            {appliedPromoCode && (
-                                <div className='flex justify-between text-green-600'>
-                                    <span>Discount ({appliedPromoCode.code})</span>
-                                    <span className='font-medium'>-₹{discountAmount?.toFixed(2)}</span>
-                                </div>
-                            )}
                             <Separator />
                             <div className='flex justify-between font-bold text-lg'>
                                 <span>Total</span>
-                                <span>₹{total?.toFixed(2)}</span>
+                                <span>₹{total}</span>
                             </div>
                             <div className='text-sm text-muted-foreground pt-4'>
                                 <p>* Free shipping on orders over ₹299</p>

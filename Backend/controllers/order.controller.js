@@ -4,7 +4,6 @@ const razorpayInstance = require('../config/Razorpay')
 const CartModel = require('../models/cart.model')
 const crypto = require('crypto')
 const UserModel = require('../models/user.model')
-const PromoCodeModel = require('../models/promoCode.model')
 
 function normalizeAmount(amount) {
     const num = Number(amount);
@@ -24,7 +23,7 @@ function normalizeAmount(amount) {
 
 const createOrder = async (req, res) => {
     try {
-        const { products, amount, tax, shipping, currency, promoCode, discountAmount } = req.body
+        const { products, amount, tax, shipping, currency } = req.body
         const normalizedAmount = normalizeAmount(amount)
         const options = {
             amount: normalizedAmount,
@@ -34,17 +33,6 @@ const createOrder = async (req, res) => {
 
         const razorpayOrder = await razorpayInstance.orders.create(options)
 
-        // Update promo code usage if applicable
-        if (promoCode) {
-            await PromoCodeModel.findOneAndUpdate(
-                { code: promoCode },
-                { 
-                    $inc: { usedCount: 1 },
-                    $addToSet: { usedBy: req.user._id }
-                }
-            )
-        }
-
         // save order to database (schema uses 'product' not 'products')
         const newOrder = await OrderModel.create({
             user: req.user._id,
@@ -53,8 +41,6 @@ const createOrder = async (req, res) => {
             tax,
             shipping,
             currency: currency || "INR",
-            promoCode: promoCode || null,
-            discountAmount: discountAmount || 0,
             razorpayOrderId: razorpayOrder.id,
         })
 

@@ -19,7 +19,7 @@ function ProductDesc({ product }) {
             return
         }
         try{    
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/cart/add`, {productId},
+            const response = await axios.post(`http://localhost:3000/api/cart/add`, {productId},
              {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
@@ -28,12 +28,9 @@ function ProductDesc({ product }) {
             if( response.data.success){
                 toast.success('Product added to cart successfully')
                 dispatch(setCart(response.data.cart))
-            } else {
-                toast.error(response.data.message || 'Failed to add product to cart')
             } 
         } catch (error) {
-            console.error('Error adding to cart:', error)
-            toast.error(error.response?.data?.message || 'Failed to add product to cart. Please try again.')
+            console.log(error)
         }
     }
     return (

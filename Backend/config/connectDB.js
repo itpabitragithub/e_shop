@@ -9,10 +9,6 @@ const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('Connected to MongoDB');
-        
-        // Clean up incorrect indexes after connection
-        const CartModel = require('../models/cart.model');
-        await CartModel.cleanupIndexes();
     } catch (error) {
         console.log("MongoDB connection error: ", error);
         process.exit(1);

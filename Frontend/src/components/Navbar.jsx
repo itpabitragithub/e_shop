@@ -36,42 +36,39 @@ function Navbar() {
     }
     return (
         <header className='bg-purple-100 fixed w-full z-20 border-b border-gray-200'>
-            <div className='max-w-7xl mx-auto flex items-center justify-between py-2'>
+            <div className='max-w-7xl mx-auto flex items-center justify-between py-0.5 px-1'>
                 {/* logo section */}
                 <div>
-                    <Link to={"/"} className='flex items-center gap-2 hover:opacity-80 transition-opacity'>
-                        {/* <img src="/cart.png" alt="E-SHOP Logo" className='w-[50px] h-[50px] object-contain' />  */}
-                        <span className='text-2xl font-bold bg-gradient-to-r from-pink-400 to-purple-700 bg-clip-text text-transparent tracking-wide'>
-                            E-Shop
-                        </span>
+                    <Link to={"/"}>
+                        <img src="/cart.png" alt="" className='w-[80px]' /> 
                     </Link>
                 </div>
                 {/* navigation links */}
                 <nav className='flex items-center gap-6'>
                     {!isAdmin && (
                         <>
-                            <ul className='flex items-center gap-8 text-base font-semibold text-gray-700'>
+                            <ul className='flex items-center gap-7 text-base font-semibold text-gray-700'>
                                 <Link to={"/"}><li>Home</li></Link>
                                 <Link to={"/products"}><li>Products</li></Link>
                                 {user && <Link to={`/profile/${user._id}`}><li>Hello ,{user.firstName}</li></Link>}
                             </ul>
                             <Link to={"/cart"} className='relative'>
                                 <ShoppingCart />
-                                <span className='absolute -top-3 -right-5 bg-pink-500 text-white rounded-full px-2'>{cart?.items?.length || 0}</span>
+                                <span className='absolute -top-3 -right-5 bg-purple-500 text-white rounded-full px-2'>{cart?.items?.length || 0}</span>
                             </Link>
                         </>
                     )}
                     {user ? (
                         <Button
                             onClick={logoutHandler}
-                            className='bg-pink-500 text-white cursor-pointer hover:bg-pink-600 transition-colors ml-4'
+                            className='bg-purple-500 text-white cursor-pointer hover:bg-purple-600 transition-colors'
                         >
                             Logout
                         </Button>
                     ) : (
                         <Button
                             onClick={() => navigate('/login')}
-                            className='bg-gradient-to-tl from-purple-500 to-purple-800 hover:from-purple-600 hover:to-purple-900 transition-colors ml-4'
+                            className='bg-gradient-to-tl from-purple-500 to-purple-800 hover:from-purple-600 hover:to-purple-900 transition-colors'
                         >
                             Login
                         </Button>

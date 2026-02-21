@@ -13,7 +13,7 @@ function OrderCard({userOrders}) {
                     <h1 className='text-2xl font-bold'>Orders</h1>
                 </div>
                 {
-                    !userOrders || userOrders?.length === 0 ? (
+                    userOrders?.length === 0 ? (
                         <p className='text-gray-500 space-y-6 text-2xl'>No Orders found for this user yet. Start shopping now!</p>
                     ) : (
                         <div className='space-y-6 w-full'>
@@ -41,7 +41,7 @@ function OrderCard({userOrders}) {
                                                     Email: {order.user?.email || "N/A"}
                                                 </p>
                                             </div>
-                                            <span className={`${order.status === "Paid" ? "bg-green-500" : order.status === "Failed" ? "bg-red-500" : "bg-orange-300"} text-white px-2 py-1 rounded-lg`}>{order.status}</span>
+                                            <sapn className={`${order.status === "paid" ? "bg-green-500" : order.status === "Failed" ? "bg-red-500" : "bg-orange-300"} text-white px-2 py-1 rounded-lg`}>{order.status}</sapn>
                                         </div>
 
                                         {/* Productz */}
@@ -49,14 +49,14 @@ function OrderCard({userOrders}) {
                                             <h3 className='font-medium mb-2'>Products:</h3>
                                             <ul>
                                                 {
-                                                    order.products && order.products.length > 0 ? order.products.map((product, index) => (
+                                                    order.products.map((product, index) => (
                                                         <li key={index} className='flex items-center justify-between bg-gray-100 p-2 rounded-lg'>
                                                             <img onClick={() => navigate(`/product/${product.productId._id}`)} className='w-16 cursor-pointer' src={product.productId?.productImg?.[0].url} alt="" />
                                                             <span className='w-[100px] line-clamp-2'>{product.productId?.productName}</span>
                                                             <span>{product?.productId._id}</span>
                                                             <span className='font-medium'>₹{product.productId?.productPrice} * {product.quantity}</span>
                                                         </li>
-                                                    )) : <li className='text-gray-500'>No products in this order</li>
+                                                    ))
                                                 }
                                             </ul>
                                         </div>
