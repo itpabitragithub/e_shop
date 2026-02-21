@@ -1,5 +1,5 @@
 import { Label } from '@/components/ui/label';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'sonner';
 
 function AddressForm() {
     const [formData, setFormData] = useState({
@@ -40,25 +41,47 @@ function AddressForm() {
         setShowForm(false);
     }
 
+    const [appliedPromoCode, setAppliedPromoCode] = useState(null);
+    const [discountAmount, setDiscountAmount] = useState(0);
+
+    useEffect(() => {
+        // Get promo code from sessionStorage
+        const promoCodeData = sessionStorage.getItem('appliedPromoCode');
+        if (promoCodeData) {
+            try {
+                const promo = JSON.parse(promoCodeData);
+                setAppliedPromoCode(promo);
+                setDiscountAmount(promo.discountAmount || 0);
+            } catch (error) {
+                console.error('Error parsing promo code:', error);
+            }
+        }
+    }, []);
+
     const subtotal = cart.totalPrice;
     const shipping = subtotal > 50 ? 0 : 10;
     const tax = parseFloat((subtotal * 0.05).toFixed(2));
-    const total = subtotal + shipping + tax;
+    const totalBeforeDiscount = subtotal + shipping + tax;
+    const total = totalBeforeDiscount - discountAmount;
 
     console.log(cart);
 
     const handlePayment = async () => {
         const accessToken = localStorage.getItem('token');
         try {
+            const products = cart?.items?.map(item => ({
+                productId: item.productId?._id ?? item.productId,
+                quantity: item.quantity,
+            })).filter(p => p.productId) ?? [];
+
             const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/orders/create-order`, {
-                products: cart?.items?.map(item => ({
-                    productId: item.productId._id,
-                    quantity: item.quantity,
-                })),
+                products,
                 tax: tax,
                 amount: total,
                 shipping: shipping,
-                currency: "INR"
+                currency: "INR",
+                promoCode: appliedPromoCode?.code || null,
+                discountAmount: discountAmount || 0
             }, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
@@ -88,6 +111,8 @@ function AddressForm() {
                                 items: [],
                                 totalPrice: 0
                             }));
+                            // Clear promo code from sessionStorage after successful payment
+                            sessionStorage.removeItem('appliedPromoCode');
                             navigate("/order-success");
                         } else {
                             toast.error("❌ Payment verification failed !");
@@ -139,8 +164,9 @@ function AddressForm() {
             rzp.open();
 
         } catch (error) {
-            console.log(error);
-            toast.error("Something went wrong while Processing payment");
+            console.error(error);
+            const msg = error.response?.data?.message || error.message || "Something went wrong while processing payment";
+            toast.error(msg);
         }
     }
 
@@ -299,10 +325,16 @@ function AddressForm() {
                                 <span>Tax</span>
                                 <span>₹{tax}</span>
                             </div>
+                            {appliedPromoCode && (
+                                <div className='flex justify-between text-green-600'>
+                                    <span>Discount ({appliedPromoCode.code})</span>
+                                    <span className='font-medium'>-₹{discountAmount?.toFixed(2)}</span>
+                                </div>
+                            )}
                             <Separator />
                             <div className='flex justify-between font-bold text-lg'>
                                 <span>Total</span>
-                                <span>₹{total}</span>
+                                <span>₹{total?.toFixed(2)}</span>
                             </div>
                             <div className='text-sm text-muted-foreground pt-4'>
                                 <p>* Free shipping on orders over ₹299</p>

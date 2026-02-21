@@ -27,7 +27,9 @@ const register = async (req, res) => {
             firstName,
             lastName,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            user_type: 'user',
+            role: 'CUSTOMER'
         })
         const token = jwt.sign(
             { id: newUser._id },
@@ -394,7 +396,8 @@ const updateUser = async (req, res) => {
         const loggedInUser = req.user // from isAuthenticated middleware
         const { firstName, lastName, phoneNumber, address, city, zipCode } = req.body
 
-        if (loggedInUser._id.toString() !== userIdUpdate && loggedInUser.role !== "ADMIN") {
+        const isAdminUser = loggedInUser.user_type === 'admin' || loggedInUser.role === 'ADMIN' || ['SUPER_ADMIN', 'MANAGER', 'SUPPORT'].includes(loggedInUser.role)
+        if (loggedInUser._id.toString() !== userIdUpdate && !isAdminUser) {
             return res.status(403).json({
                 success: false,
                 message: "You are not authorized to update this profile"

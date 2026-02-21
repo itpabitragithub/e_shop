@@ -11,63 +11,81 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Eye, EyeOff, Loader2, User, Shield } from 'lucide-react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { useDispatch } from 'react-redux'
 import { setUser } from '../redux/userSlice'
 
 
-function Login() {
+function Login({ defaultUserType = 'user' }) {
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [userType, setUserType] = useState(defaultUserType) // 'user' | 'admin'
     const [formData, setFormData] = useState({
         email: "",
         password: ""
     })
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const location = useLocation()
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
     }
     const handleSubmit = async (e) => {
-        e.preventDefault()// Prevent the page from reloading
-        console.log(formData);
+        e.preventDefault()
         try {
             setLoading(true)
-            const response = await axios.post(`http://localhost:3000/api/user/login`, formData, {
-                headers: {
-                    // Authorization: `Bearer ${accessToken}`,
-                    "Content-Type": "application/json"
-                }
-            });
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/auth/login`,
+                { ...formData, user_type: userType },
+                { headers: { "Content-Type": "application/json" } }
+            );
             if (response.data.success) {
-                // Save token and user to localStorage
                 localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.accessToken));
-                dispatch(setUser(response.data.accessToken));
+                const userData = { ...response.data.accessToken, user_type: response.data.user_type };
+                localStorage.setItem('user', JSON.stringify(userData));
+                dispatch(setUser(userData));
                 toast.success(response.data.message);
-                navigate("/");
+                const redirectTo = location.state?.from?.pathname || (userType === 'admin' ? '/dashboard/sales' : '/');
+                navigate(redirectTo);
             }
-            console.log(response);
         } catch (error) {
-            console.log(error);
             toast.error(error.response?.data?.message || error.message || "An error occurred");
-        }
-        finally{
+        } finally {
             setLoading(false)
         }
     }
   return (
-    <div className='flex justify-center items-center min-h-screen bg-purple-100'>
+    <div className='flex justify-center items-center min-h-screen bg-pink-100'>
             <Card className="w-full max-w-sm">
                 <CardHeader>
-                    <CardTitle>Create your account</CardTitle>
+                    <CardTitle>Login</CardTitle>
                     <CardDescription>
-                        Enter given details below to create your account
+                        Sign in with your account
                     </CardDescription>
+                    <div className="flex gap-2 mt-2">
+                        <Button
+                            type="button"
+                            variant={userType === 'user' ? 'default' : 'outline'}
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => setUserType('user')}
+                        >
+                            <User className="w-4 h-4 mr-1" /> User
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={userType === 'admin' ? 'default' : 'outline'}
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => setUserType('admin')}
+                        >
+                            <Shield className="w-4 h-4 mr-1" /> Admin
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-col gap-3">
@@ -106,10 +124,17 @@ function Login() {
                     </div>
                 </CardContent>
                 <CardFooter className="flex-col gap-2">
-                    <Button onClick={handleSubmit} type="submit" className="w-full cursor-pointer bg-purple-700 text-white hover:bg-purple-800">
+                    <Button onClick={handleSubmit} type="submit" className="w-full cursor-pointer bg-pink-500 text-white hover:bg-pink-600">
                         {loading?<><Loader2 className='w-4 h-4 text-white animate-spin' />Please wait...</>:"Login"}
                     </Button>
-                    <p className='text-center text-sm text-gray-500'>Don't have an account? <Link to={"/signup"} className='hover:underline cursor-pointer text-blue-800'>Signup</Link></p>
+                    {userType === 'user' ? (
+                        <>
+                            <p className='text-center text-sm text-gray-500'>Don't have an account? <Link to={"/signup"} className='hover:underline cursor-pointer text-blue-800'>Signup</Link></p>
+                            <p className='text-center text-sm text-gray-500'>Admin? <Link to={"/admin/login"} className='hover:underline cursor-pointer text-blue-800'>Login here</Link></p>
+                        </>
+                    ) : (
+                        <p className='text-center text-sm text-gray-500'>User? <Link to={"/login"} className='hover:underline cursor-pointer text-blue-800'>Login here</Link></p>
+                    )}
 
                 </CardFooter>
             </Card>

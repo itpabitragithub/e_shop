@@ -10,6 +10,7 @@ function AdminSales() {
     totalProducts: 0,
     totalSales: 0,
     salesByDate: [],
+    sales: [],
   })
 
   const fetchSates = async () => {
@@ -22,7 +23,15 @@ function AdminSales() {
       })
 
       if (response.data.success) {
-        setStateData(response.data.salesData)
+        const data = response.data
+        setStateData({
+          totalUsers: data.totalUsers ?? 0,
+          totalOrders: data.totalOrders ?? 0,
+          totalProducts: data.totalProducts ?? 0,
+          totalSales: data.totalSales ?? 0,
+          salesByDate: data.sales ?? [],
+          sales: data.sales ?? [],
+        })
       }
     } catch (error) {
       console.log("Error fetching sales data:", error);
@@ -69,7 +78,7 @@ function AdminSales() {
           </CardHeader>
           <CardContent style={{height: 300}}>
             <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={stateData.sales}>
+                <AreaChart data={stateData.sales ?? []}>
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />

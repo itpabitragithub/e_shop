@@ -27,10 +27,16 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    user_type: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user"
+    },
     role: {
         type: String,
-        enum: ["ADMIN", "USER"],
-        default: "USER"
+        enum: ["CUSTOMER", "VIP", "SUPER_ADMIN", "MANAGER", "SUPPORT", "ADMIN", "USER"], // ADMIN, USER for backward compatibility
+        default: "CUSTOMER"
+        // User roles: CUSTOMER, VIP, USER | Admin roles: SUPER_ADMIN, MANAGER, SUPPORT, ADMIN
     },
     token: {
         type: String,

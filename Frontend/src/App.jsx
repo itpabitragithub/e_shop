@@ -22,6 +22,19 @@ import SingleProduct from "./pages/admin/SingleProduct"
 import AdminOrders from "./pages/admin/AdminOrders"
 import AddressForm from "./pages/AddressForm"
 import OrderSuccess from "./pages/OrderSuccess"
+import MyOrder from "./pages/MyOrder"
+
+function NotFound() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6">
+      <h1 className="text-4xl font-bold text-gray-800">404</h1>
+      <p className="text-gray-600">Page not found</p>
+      <Button asChild variant="outline">
+        <a href="/">Go to Home</a>
+      </Button>
+    </div>
+  )
+}
 
 const router = createBrowserRouter([
   {
@@ -37,6 +50,10 @@ const router = createBrowserRouter([
     element: <><Login /></>
   },
   {
+    path: "/admin/login",
+    element: <><Login defaultUserType="admin" /></>
+  },
+  {
     path: "/verify",
     element: <><Verify /></>
   },
@@ -46,7 +63,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/profile/:userId",
-    element: <ProtectedRoutes><Navbar /><Profile /></ProtectedRoutes>
+    element: <ProtectedRoutes userOnly><Navbar /><Profile /></ProtectedRoutes>
   },
   {
     path: "/products",
@@ -58,15 +75,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/cart",
-    element: <ProtectedRoutes><Navbar /><Cart /></ProtectedRoutes>,
+    element: <ProtectedRoutes userOnly><Navbar /><Cart /></ProtectedRoutes>,
   },
   {
     path: "/address",
-    element: <ProtectedRoutes><AddressForm /></ProtectedRoutes>,
+    element: <ProtectedRoutes userOnly><AddressForm /></ProtectedRoutes>,
   },
   {
     path: "/order-success",
-    element: <ProtectedRoutes><OrderSuccess /></ProtectedRoutes>,
+    element: <ProtectedRoutes userOnly><OrderSuccess /></ProtectedRoutes>,
+  },
+  {
+    path: "/orders",
+    element: <ProtectedRoutes userOnly><Navbar /><MyOrder /><Footer /></ProtectedRoutes>,
   },
   {
     path: "/dashboard",
@@ -101,6 +122,10 @@ const router = createBrowserRouter([
         element: <UserInfo />,
       },
     ]
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   }
 ])
 

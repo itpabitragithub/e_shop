@@ -14,7 +14,7 @@ function Hero() {
                         <p className='text-xl text-blue-100 mb-6'>Discover cutting-edge technology with unbeatble deals on smartphone , laptops , tablets , and more.</p>
                         <div className='flex flex-col sm:flex-row gap-4'>
                             <Button onClick={() => navigate('/products')} className='bg-white text-blue-600 hover:bg-gray-400 hover:text-white transition-colors'>Shop Now</Button>
-                            <Button  variant="outline" className='border-white text-white hover:bg-white hover:text-blue-600 bg-transparent'>View Deals</Button>
+                            <Button onClick={() => document.getElementById('best-deals')?.scrollIntoView({ behavior: 'smooth' })} variant="outline" className='border-white text-white hover:bg-white hover:text-blue-600 bg-transparent'>View Deals</Button>
                         </div>
                     </div>
                     <div className='relative'>

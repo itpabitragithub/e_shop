@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const CartModel = require('../models/cart.model')
 const ProductModel = require('../models/product.model')
 
@@ -33,10 +34,19 @@ const addToCart = async (req, res) => {
         
         const { productId } = req.body;
         
+        // Validate productId
         if (!productId) {
             return res.status(400).json({
                 success: false,
                 message: "Product ID is required"
+            })
+        }
+
+        // Validate productId is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Product ID format"
             })
         }
 
@@ -48,6 +58,15 @@ const addToCart = async (req, res) => {
                 message: "Product not found"
             })
         }
+
+        // Validate product has a price
+        if (!product.productPrice || product.productPrice <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Product price is invalid"
+            })
+        }
+
         // find the user's cart (if exists)
         let cart = await CartModel.findOne({ userId });
 
@@ -55,14 +74,26 @@ const addToCart = async (req, res) => {
         if (!cart) {
             cart = new CartModel({
                 userId: userId,
-                items: [{ productId, quantity: 1, price: product.productPrice }],
+                items: [{ 
+                    productId: productId, 
+                    quantity: 1, 
+                    price: product.productPrice 
+                }],
                 totalPrice: product.productPrice
             });
         }
         else {
+            // Clean up any items with null or invalid productId before processing
+            cart.items = cart.items.filter(item => 
+                item.productId && 
+                mongoose.Types.ObjectId.isValid(item.productId)
+            );
+
             // Find if product is already in cart
-            const itemIndex = cart.items.findIndex
-                (item => item.productId.toString() === productId);
+            const itemIndex = cart.items.findIndex(
+                item => item.productId && item.productId.toString() === productId.toString()
+            );
+            
             if (itemIndex > -1) {
                 // if product exists -> just increase the quantity
                 cart.items[itemIndex].quantity += 1;
@@ -70,7 +101,7 @@ const addToCart = async (req, res) => {
             else {
                 // if new product -> add to cart
                 cart.items.push({
-                    productId,
+                    productId: productId,
                     quantity: 1,
                     price: product.productPrice
                 })
@@ -78,7 +109,7 @@ const addToCart = async (req, res) => {
 
             // Recalculate the total price
             cart.totalPrice = cart.items.reduce(
-                (acc, item) => acc + item.price * item.quantity, 0
+                (acc, item) => acc + (item.price * item.quantity), 0
             )
         }
 

@@ -22,11 +22,15 @@ const orderSchema = new mongoose.Schema({
    shipping: { type: Number, required: true },
    currency: { type: String, required: true },
    status: { type: String, enum: ["Pending", "Paid", "Failed"], default: "Pending" },
+   
+   // Promo code fields
+   promoCode: { type: String, default: null },
+   discountAmount: { type: Number, default: 0 },
 
-   //  Razorpay Fields
+   //  Razorpay Fields (paymentId and signature set after payment)
    razorpayOrderId: { type: String, required: true },
-   razorpayPaymentId: { type: String, required: true },
-   razorpaySignature: { type: String, required: true }
+   razorpayPaymentId: { type: String },
+   razorpaySignature: { type: String }
 }, {
    timestamps: true
 })

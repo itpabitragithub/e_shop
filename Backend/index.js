@@ -1,10 +1,9 @@
 const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
-const morgan = require('morgan')
-const helmet = require('helmet')
 const cookieParser = require('cookie-parser')
 
+const authRoutes = require('./routes/authRoute')
 const userRoutes = require('./routes/userRoute')
 const productRoutes = require('./routes/productRoute')
 const cartRoute = require('./routes/cartRoute')
@@ -19,17 +18,14 @@ const ProductModel = require('./models/product.model')
 
 const app = express() 
 app.use(cors({
-    credentials: true, //
+    credentials: true, 
     origin: "http://localhost:5173"
 }))
 app.use(express.json()) // read and parse JSON data sent from the client to your Express server.
 app.use(cookieParser())
-app.use(morgan())
-app.use(helmet({
-    crossOriginResourcePolicy: false 
-}))  
 connectDB()
 
+app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/product', productRoutes)
 app.use('/api/cart', cartRoute)
