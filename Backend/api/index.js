@@ -3,13 +3,13 @@ const cors = require('cors')
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
 
-const authRoutes = require('./routes/authRoute')
-const userRoutes = require('./routes/userRoute')
-const productRoutes = require('./routes/productRoute')
-const cartRoute = require('./routes/cartRoute')
-const orderRoute = require('./routes/orderRoute')
+const authRoutes = require('../routes/authRoute')
+const userRoutes = require('../routes/userRoute')
+const productRoutes = require('../routes/productRoute')
+const cartRoute = require('../routes/cartRoute')
+const orderRoute = require('../routes/orderRoute')
 
-const connectDB = require('./config/connectDB')
+const connectDB = require('../config/connectDB')
 
 const app = express()
 
