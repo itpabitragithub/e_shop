@@ -33,7 +33,7 @@ app.use(cors({
 }))
 
 // ✅ VERY IMPORTANT — HANDLE PREFLIGHT
-app.options("*", cors())
+app.options("*", (req,res)=>res.sendStatus(200))
 
 app.use(express.json())
 app.use(cookieParser())
