@@ -1,32 +1,27 @@
 const mongoose = require('mongoose')
-
-let isConnected = false
+require('dotenv').config()
 
 const connectDB = async () => {
-  if (isConnected) {
-    return
-  }
-
-  try {
-    const db = await mongoose.connect(process.env.MONGO_URI, {
-      bufferCommands: false
-    })
-
-    isConnected = db.connections[0].readyState
-    console.log('MongoDB Connected')
-
-    // 👇 load model AFTER connection
-    const CartModel = require('../models/cart.model')
-    if (CartModel.cleanupIndexes) {
-      await CartModel.cleanupIndexes()
+    if (!process.env.MONGO_URI) {
+        const err = new Error('MONGO_URI is not defined')
+        console.error(err.message)
+        throw err
     }
-
-  } catch (error) {
-    console.error("MongoDB connection error:", error.message)
-
-    // ❌ DO NOT EXIT IN SERVERLESS
-    // process.exit(1)
-  }
+    try {
+        if (mongoose.connection.readyState === 1) return
+        await mongoose.connect(process.env.MONGO_URI)
+        console.log('Connected to MongoDB')
+        // Only run index cleanup when not on Vercel (avoids cold-start issues)
+        if (!process.env.VERCEL) {
+            const CartModel = require('../models/cart.model')
+            await CartModel.cleanupIndexes()
+        }
+    } catch (error) {
+        console.error('MongoDB connection error:', error.message)
+        if (!process.env.VERCEL) process.exit(1)
+        throw error
+    }
 }
 
-module.exports = connectDB
+module.exports = connectDB 
+  
